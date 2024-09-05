@@ -1,0 +1,5 @@
+
+
+'''
+dockere compose up -d
+'''

@@ -1,0 +1,15 @@
+# Read the documentation: https://fosrestbundle.readthedocs.io/en/3.x/
+fos_rest:
+    disable_csrf_role: ROLE_API
+    param_fetcher_listener: 'force' 
+    allowed_methods_listener: true 
+    body_listener: true
+    format_listener:
+        enabled: true
+        rules:
+            - { path: '^/api', prefer_extension: true, priorities: ['json'], fallback_format: 'json' }
+    versioning: true
+    view:
+        view_response_listener: 'force'
+    zone:
+        - { path: ^/api/* }
