@@ -7,10 +7,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: LoanEntityRepository::class)]
 class LoanEntity
 {
+    use SoftDeleteableEntity;
+    use TimestampableEntity;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,9 +24,6 @@ class LoanEntity
 
     #[ORM\Column]
     private ?int $installments = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: Types::BIGINT)]
     private ?string $amount = null;
@@ -33,6 +36,9 @@ class LoanEntity
 
     #[ORM\ManyToOne(inversedBy: 'loanEntities')]
     private ?User $modified_by = null;
+
+    #[ORM\Column]
+    private ?int $interest = null;
 
     public function __construct()
     {
@@ -118,6 +124,18 @@ class LoanEntity
     public function setModifiedBy(?User $modified_by): static
     {
         $this->modified_by = $modified_by;
+
+        return $this;
+    }
+
+    public function getInterest(): ?int
+    {
+        return $this->interest;
+    }
+
+    public function setInterest(int $interest): static
+    {
+        $this->interest = $interest;
 
         return $this;
     }
