@@ -2,33 +2,34 @@
 
 namespace App\Controller;
 
-use App\Config\Versions;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Request\ParamFetcher;
+use Nelmio\ApiDocBundle\Annotation\Areas;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Choice;
 
 
+#[Areas(['v1'])]
 class LoanController extends AbstractFOSRestController
 {
+
     #[Rest\View()]
-    #[Rest\Get('/loan', name: 'index')]
-    #[QueryParam(
-        name: 'version',
-        requirements: '1.0',
-        description: 'API version 1.0',
-        nullable: false,
-        strict: true,
-    )]
+    #[Rest\Get('/', name: 'v1_index')]
     public function index(Request $request)
     {
-        
-        $version = $request->attributes->get('version');
 
         return [
-            'version' => 'version='.$version
+            'data' => 'data'
+        ];
+    }
+
+    #[Rest\View()]
+    #[Rest\Get('/loan', name: 'v1_loan')]
+    public function loan(Request $request)
+    {
+
+
+        return [
+            'data'    => 'data'
         ];
     }
 }

@@ -8,7 +8,13 @@ fos_rest:
         enabled: true
         rules:
             - { path: '^/api', prefer_extension: true, priorities: ['json'], fallback_format: 'json' }
-    versioning: true
+    versioning:
+        enabled: false
+        resolvers:
+            query: false
+            custom_header: false
+            media_type: 
+                enabled: false
     view:
         view_response_listener: 'force'
     zone:

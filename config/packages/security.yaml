@@ -44,6 +44,8 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/loan, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/doc.json, roles: PUBLIC_ACCESS }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
 
