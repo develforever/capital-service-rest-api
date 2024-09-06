@@ -17,7 +17,7 @@ services:
   swagger:
     image: swaggerapi/swagger-ui
     environment:
-      - SWAGGER_JSON_URL=http://localhost:9000/api/doc.json
+      - SWAGGER_JSON_URL=http://localhost:9000/api/v1/doc.json
     ports:
       - 9080:8080
     depends_on:

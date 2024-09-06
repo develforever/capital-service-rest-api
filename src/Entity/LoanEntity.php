@@ -31,6 +31,9 @@ class LoanEntity
     #[ORM\OneToMany(targetEntity: LoanSchedule::class, mappedBy: 'loan_id')]
     private Collection $loanSchedules;
 
+    #[ORM\ManyToOne(inversedBy: 'loanEntities')]
+    private ?User $modified_by = null;
+
     public function __construct()
     {
         $this->loanSchedules = new ArrayCollection();
@@ -103,6 +106,18 @@ class LoanEntity
                 $loanSchedule->setLoanId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getModifiedBy(): ?User
+    {
+        return $this->modified_by;
+    }
+
+    public function setModifiedBy(?User $modified_by): static
+    {
+        $this->modified_by = $modified_by;
 
         return $this;
     }

@@ -13,20 +13,12 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         # users_in_memory: { memory: null }
     firewalls:
-        # login:
-        #     pattern: ^/api/login
-        #     stateless: true
-        #     provider: app_user_provider
-        #     json_login:
-        #         username_path: username
-        #         check_path: /api/login_check
-        #         success_handler: lexik_jwt_authentication.handler.authentication_success
-        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        
         main:
             lazy: true
             provider: app_user_provider
             json_login:
-                check_path: /api/login_check
+                check_path: /api/v1/login_check
                 username_path: username
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -51,8 +43,8 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/doc.json, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/doc.json, roles: PUBLIC_ACCESS }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
 
 

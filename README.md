@@ -1,5 +1,6 @@
 
 
-'''
-dockere compose up -d
-'''
+
+```
+dockere compose up -d --build
+```
