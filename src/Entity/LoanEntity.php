@@ -12,8 +12,7 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: LoanEntityRepository::class)]
-class LoanEntity
-{
+class LoanEntity {
     use SoftDeleteableEntity;
     use TimestampableEntity;
     
@@ -62,17 +61,6 @@ class LoanEntity
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
 
     public function getAmount(): ?string
     {
@@ -139,4 +127,6 @@ class LoanEntity
 
         return $this;
     }
+
+    
 }

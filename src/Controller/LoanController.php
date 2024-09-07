@@ -3,15 +3,16 @@
 namespace App\Controller;
 
 use \Exception;
-use \Datetime;
 use App\Entity\LoanEntity;
 use App\DTO\LoanRequestDTO;
 use App\Entity\LoanSchedule;
 use Doctrine\ORM\EntityManagerInterface;
-
+use OpenApi\Attributes as OA;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use LoanResponse;
 use Nelmio\ApiDocBundle\Annotation\Areas;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,11 +32,17 @@ class LoanController extends AbstractFOSRestController
 
     #[Rest\View()]
     #[Rest\Post('/loan', name: 'v1_loan')]
-
-    public function loan(Request $request, #[MapRequestPayload] LoanRequestDTO $loanRequestDTO, EntityManagerInterface $manager)
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new Model(type: LoanResponse::class)
+    )]
+    public function loan(Request $request, #[MapRequestPayload] LoanRequestDTO $loanRequestDTO, EntityManagerInterface $manager): JsonResponse
     {
 
-        $data = ['s'];
+        $data = [
+            'loan' => null
+        ];
 
         $manager->getConnection()->beginTransaction();
 
@@ -44,19 +51,17 @@ class LoanController extends AbstractFOSRestController
 
         try {
 
-
-
             $loan = new LoanEntity();
             $loan->setInstallments($loanRequestDTO->installments);
             $loan->setAmount($loanRequestDTO->amount);
-            // todo make configurable eg. .env file or .yaml file ?
+            // todo make configurable eg. .env file or .yaml file ? or maybe from DTO?
             $annualInterest = 7;
-            $annualInterestPercent = 7/100;
+            $annualInterestPercent = 7 / 100;
             $loan->setInterest($annualInterest);
 
             $manager->persist($loan);
 
-            for ($i = 0; $i < $loanRequestDTO->installments; $i++) {
+            for ($i = 0; $i < $installments; $i++) {
 
 
                 $r = $amount *
@@ -81,6 +86,8 @@ class LoanController extends AbstractFOSRestController
 
             $manager->flush();
             $manager->getConnection()->commit();
+
+            $data['loan'] = $loan;
         } catch (Exception $e) {
             $manager->getConnection()->rollBack();
             throw $e;
@@ -111,10 +118,9 @@ class LoanController extends AbstractFOSRestController
     public function loanCalculations(Request $request, EntityManagerInterface $manager)
     {
 
-        //$manager->getFilters()->disable('soft_delete');
+        $loansRepo = $manager->getRepository(LoanEntity::class);
+        $loans = $loansRepo->findAllGreaterThanPrice();
 
-        $loans = $manager->getRepository(LoanEntity::class)->findAll();
-
-        return new JsonResponse( data:$loans, status: Response::HTTP_OK);
+        return new JsonResponse(data: $loans, status: Response::HTTP_OK);
     }
 }
