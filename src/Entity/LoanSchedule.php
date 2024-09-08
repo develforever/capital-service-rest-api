@@ -6,9 +6,10 @@ use App\Repository\LoanScheduleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: LoanScheduleRepository::class)]
-class LoanSchedule
+class LoanSchedule implements JsonSerializable
 {
 
     use TimestampableEntity;
@@ -96,5 +97,11 @@ class LoanSchedule
         $this->loan_id = $loan_id;
 
         return $this;
+    }
+
+    public function jsonSerialize():array {
+
+        $out = get_object_vars($this);
+        return $out;
     }
 }

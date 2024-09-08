@@ -84,10 +84,13 @@ class LoanController extends AbstractFOSRestController
                 $manager->persist($loanSchedule);
             }
 
+            
+            $data['loan'] = $loan;
+
             $manager->flush();
             $manager->getConnection()->commit();
 
-            $data['loan'] = $loan;
+            
         } catch (Exception $e) {
             $manager->getConnection()->rollBack();
             throw $e;

@@ -10,9 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: LoanEntityRepository::class)]
-class LoanEntity {
+class LoanEntity implements JsonSerializable {
     use SoftDeleteableEntity;
     use TimestampableEntity;
     
@@ -128,5 +129,10 @@ class LoanEntity {
         return $this;
     }
 
+    public function jsonSerialize():array {
+
+        $out = get_object_vars($this);
+        return $out;
+    }
     
 }
