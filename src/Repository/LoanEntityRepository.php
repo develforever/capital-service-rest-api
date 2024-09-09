@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LoanEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -49,14 +50,16 @@ class LoanEntityRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
-            'SELECT l.id, l.createdAt, l.amount, sum(ls.interest) as interest_sum
+            'SELECT l, sum(ls.interest) as interestSum
             FROM App\Entity\LoanEntity l
             left join l.loanSchedules ls
-            where l.deletedAt is null
+            where (:all = false and l.deletedAt is null or :all = true)
             group by l.id
             order by sum(ls.interest) desc'
         );
+        $query->setParameter('all', (bool)$all);
+        $query->setMaxResults(4);
 
-        return $query->getResult();
+        return $query->getResult(AbstractQuery::HYDRATE_ARRAY);
     }
 }

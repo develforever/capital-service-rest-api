@@ -6,13 +6,18 @@ use \Exception;
 use App\Entity\LoanEntity;
 use App\DTO\LoanRequestDTO;
 use App\Entity\LoanSchedule;
+use App\Model\Loans;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use LoanResponse;
+use LoanResponseData;
+use LoansResponse;
 use Nelmio\ApiDocBundle\Annotation\Areas;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes\Schema;
+use stdClass;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,9 +45,8 @@ class LoanController extends AbstractFOSRestController
     public function loan(Request $request, #[MapRequestPayload] LoanRequestDTO $loanRequestDTO, EntityManagerInterface $manager): JsonResponse
     {
 
-        $data = [
-            'loan' => null
-        ];
+        $data = new LoanResponse();
+
 
         $manager->getConnection()->beginTransaction();
 
@@ -84,13 +88,16 @@ class LoanController extends AbstractFOSRestController
                 $manager->persist($loanSchedule);
             }
 
-            
-            $data['loan'] = $loan;
+
+            $data->data = new LoanResponseData();
+            $data->data->attributes = $loan;
+            $data->data->id = $loan->getId();
+
+            $data->links = new stdClass;
+            $data->links->self = $request->getScheme() . '://' . $request->getHttpHost() . '/api/v1/loan/' . $loan->getId();
 
             $manager->flush();
             $manager->getConnection()->commit();
-
-            
         } catch (Exception $e) {
             $manager->getConnection()->rollBack();
             throw $e;
@@ -98,6 +105,31 @@ class LoanController extends AbstractFOSRestController
 
 
         return new JsonResponse(data: $data,  status: Response::HTTP_OK);
+    }
+
+
+    #[Rest\View()]
+    #[Rest\Get('/loan/{id}', name: 'v1_loan_get')]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new Model(type: LoanResponse::class)
+    )]
+    public function loanGet(
+        LoanEntity $loan,
+    ) {
+
+        if (!$loan) {
+
+            return new JsonResponse(status: Response::HTTP_NOT_FOUND);
+        }
+
+        $data = new LoanResponse();
+        $data->data = new LoanResponseData();
+        $data->data->attributes = $loan;
+        $data->data->id = $loan->getId();
+
+        return new JsonResponse(data: $data, status: Response::HTTP_OK);
     }
 
     #[Rest\View()]
@@ -118,12 +150,32 @@ class LoanController extends AbstractFOSRestController
 
     #[Rest\View()]
     #[Rest\Get('/loans', name: 'v1_loan_calculations')]
+    #[OA\QueryParameter(name: 'all', schema: new Schema(type: 'integer', enum: [1, 0], default: 0))]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new Model(type: LoansResponse::class)
+    )]
     public function loanCalculations(Request $request, EntityManagerInterface $manager)
     {
 
+        $all = (bool)$request->query->get('all', false);;
         $loansRepo = $manager->getRepository(LoanEntity::class);
-        $loans = $loansRepo->findAllGreaterThanPrice();
+        $loans = $loansRepo->findAllGreaterThanPrice($all);
+        $data = [
+            'data' => []
+        ];
 
-        return new JsonResponse(data: $loans, status: Response::HTTP_OK);
+        foreach ($loans as $item) {
+
+
+            $data['data'][] = [
+                'type' => 'loan',
+                'id' => $item[0]['id'],
+                'attributes' => $item[0],
+            ];
+        }
+
+        return new JsonResponse(data: $data, status: Response::HTTP_OK);
     }
 }
