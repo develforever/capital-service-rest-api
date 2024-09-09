@@ -41,7 +41,6 @@ Get JWT Token by running command:
 ```
 curl --location 'http://localhost:9000/api/v1/login_check' \
 --header 'Content-Type: application/json' \
---header 'Cookie: PHPSESSID=67aefa5fb6aaf4d06be786a7d7cc5a38' \
 --data '{
     "username": "johndoe",
     "password": "test"
